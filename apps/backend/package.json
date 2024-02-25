@@ -1,0 +1,28 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "tsnd --respawn src/query-lex/query-lex-handler.ts",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@aws-sdk/client-kendra": "^3.521.0",
+    "@types/aws-lambda": "^8.10.111",
+    "@types/node": "^18.14.1",
+    "aws-lambda": "^1.0.7",
+    "aws-sdk": "^2.1323.0",
+    "esbuild": "^0.20.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.521.0",
+    "@chatbot-topic/environment-configuration": "*",
+    "openai": "^4.28.0"
+  }
+}

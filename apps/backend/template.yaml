@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: aws-chatbot
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  LexBotId:
+    Type: String
+  LexAliasBotId:
+    Type: String
+  LexLocaleId:
+    Type: String
+  KendraIndexId:
+    Type: String
+  HostedS3Website:
+    Type: String
+Resources:
+  LexHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: "lex-kendra-api"
+      Description: HttpApi for the AskDogBreed chatbot
+      CorsConfiguration:
+        AllowOrigins: 
+          - !Ref HostedS3Website
+        AllowMethods:
+          - OPTIONS
+          - POST
+        AllowHeaders:
+          - '*'
+        ExposeHeaders:
+          - '*'
+        MaxAge: 600
+  LexLambdaModulesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: lex-lambda-modules-layer
+      ContentUri: src/lambda-modules-layer
+      CompatibleRuntimes:
+        - nodejs18.x
+  LexFulfilmentFailureFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lex-fulfillment-failure-function
+      CodeUri: dist/lex-fulfillment-function
+      Handler: lex-fulfillment-function-handler.handler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 3
+  QueryLexFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: query-lex
+      CodeUri: dist/query-lex
+      Handler: query-lex-handler.handler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 30
+      Layers:
+        - !Ref LexLambdaModulesLayer
+      Environment:
+        Variables:
+          AWS_LEX_BOT_ID: !Ref LexBotId
+          AWS_LEX_ALIAS_BOT_ID: !Ref LexAliasBotId
+          AWS_LEX_LOCALE_ID: !Ref LexLocaleId
+          AWS_KENDRA_INDEX_ID: !Ref KendraIndexId
+      Events:
+        QueryLexApiOptions:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LexHttpApi
+            Method: "OPTIONS"
+            Path: "/{proxy+}"
+            PayloadFormatVersion: "1.0"
+            TimeoutInMillis: 30000
+        QueryLexApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LexHttpApi
+            Method: "POST"
+            Path: "/{proxy+}"
+            PayloadFormatVersion: "1.0"
+            TimeoutInMillis: 30000
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Action:
+              - "lex:RecognizeText"
+              - "lex:PutSession"
+              Effect: Allow
+              Resource: !Sub arn:aws:lex:${AWS::Region}:${AWS::AccountId}:bot-alias/${LexBotId}/${LexAliasBotId}
+        - Version: '2012-10-17'
+          Statement:
+            - Action:
+              - kendra:Query
+              Effect: Allow
+              Resource: !Sub arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${KendraIndexId}
+

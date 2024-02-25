@@ -1,0 +1,18 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "sam-aws-chatbot"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-5pakk1iskevu"
+s3_prefix = "sam-aws-chatbot"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+parameter_overrides=[
+  "LexBotId=RIQKIQ2STY",
+  "LexAliasBotId=TSTALIASID",
+  "LexLocaleId=en_US",
+  "KendraIndexId=0303fbb4-09c7-4c6f-afeb-9df81be62e07",
+  "HostedS3Website=http://hosted-s3-website.s3-website-us-east-1.amazonaws.com"
+]
