@@ -1,0 +1,18 @@
+{
+  "name": "aws-chatbot",
+  "version": "1.0.0",
+  "description": "This project contains source code and supporting files for a serverless application that you can deploy with the AWS Serverless Application Model (AWS SAM) command line interface (CLI). It includes the following files and folders:",
+  "main": "index.js",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo run cdk:build --filter=infra dev --filter=infra",
+    "build": "turbo run build --filter=backend",
+    "deploy": "turbo run build --filter=backend deploy --filter=infra"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

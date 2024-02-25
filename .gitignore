@@ -1,0 +1,9 @@
+node_modules
+dist
+.aws-sam
+
+**/*.zip
+.DS_STORE
+.env
+
+.turbo

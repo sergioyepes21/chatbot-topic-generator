@@ -41,8 +41,8 @@ Welcome to the Turbo Repository! This mono repository is designed to efficiently
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/your-username/turbo-repository.git
-    cd turbo-repository
+    git clone https://github.com/sergioyepes21/chatbot-topic-generator.git
+    cd chatbot-topic-generator
     ```
 
 2. Install dependencies:
@@ -51,11 +51,30 @@ Welcome to the Turbo Repository! This mono repository is designed to efficiently
     npm install
     ```
 
-3. Navigate to the `backend` and `infrastructure` directories, and follow the README instructions for each app to set up the required environment variables and deploy AWS resources.
+3. Navigate to the `backend` and `infrastructure` directories, and follow the README instructions for each app to set up the required environment variables.
 
-## Running the Apps
+## Deploy
 
-- Follow the instructions in each app's README to run and test the applications.
+1. Deploy the services:
+
+    ```bash
+    npm run deploy
+    ```
+
+## Locally Running the Apps
+
+The AWS SAM CLI locally deploys on Docker the required API Gateway and AWS Lambda so you can test.
+
+**Prerequisites**: You should have deployed the infrastructure at least once, so that the S3 Bucket and the AWS Kendra index exist when the Lambda code is executed.
+
+1. Install the [Docker Engine](https://docs.docker.com/engine/install/)
+2. Install the [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
+3. Fill the `.env` file from the `infra` application with the required values 
+4. Run the infrastructure locally:
+
+    ```bash
+    npm run dev
+    ```
 
 ## Contributing
 
@@ -67,7 +86,7 @@ Welcome to the Turbo Repository! This mono repository is designed to efficiently
 
 ## Issues
 
-If you encounter any issues or have suggestions for improvements, please [open an issue](https://github.com/your-username/turbo-repository/issues).
+If you encounter any issues or have suggestions for improvements, please open an issue.
 
 ## License
 
