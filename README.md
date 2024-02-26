@@ -1,6 +1,6 @@
-# Chatbot Topic Generator FRepository README
+# Chatbot Topic Generator Repository README
 
-Welcome to the Turbo Repository! This mono repository is designed to efficiently generate and manage frequently asked questions (FAQs) using OpenAI GPT-3.5-turbo, AWS services, and TypeScript. The repository consists of two main apps: backend and infrastructure, along with an internal package for environment configuration.
+Welcome to the Chatbot Topic Generator Repository! This mono repository is designed to efficiently generate and manage frequently asked questions (FAQs) using OpenAI GPT-3.5-turbo, AWS services, and TypeScript. The repository consists of two main apps: backend and infrastructure, along with an internal package for environment configuration.
 
 The following cloud architecture illustrates a high-level flow:
 
@@ -60,7 +60,7 @@ The following cloud architecture illustrates a high-level flow:
 
 ## Deploy
 
-1. Deploy the services:
+1. Deploy the services from the root directory:
 
     ```bash
     npm run deploy
@@ -75,7 +75,7 @@ The AWS SAM CLI locally deploys on Docker the required API Gateway and AWS Lambd
 1. Install the [Docker Engine](https://docs.docker.com/engine/install/)
 2. Install the [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
 3. Fill the `.env` file from the `infra` application with the required values 
-4. Run the infrastructure locally:
+4. Run the infrastructure locally from the root directory:
 
     ```bash
     npm run dev
