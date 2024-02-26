@@ -1,6 +1,10 @@
-# Turbo-Repository README
+# Chatbot Topic Generator FRepository README
 
 Welcome to the Turbo Repository! This mono repository is designed to efficiently generate and manage frequently asked questions (FAQs) using OpenAI GPT-3.5-turbo, AWS services, and TypeScript. The repository consists of two main apps: backend and infrastructure, along with an internal package for environment configuration.
+
+The following cloud architecture illustrates a high-level flow:
+
+![Cloud Architecture](./assets/Cloud%20Architecture.jpg)
 
 ## Repository Structure
 
@@ -14,10 +18,13 @@ Welcome to the Turbo Repository! This mono repository is designed to efficiently
 
 ### 2. Infrastructure App
 
+![Cloud Architecture](./assets/AWS%20Architecture.drawio.png)
+
 - **Language:** Node.js, TypeScript, AWS CDK
 - **AWS Resources Created:**
   - 1 AWS S3 Bucket (receives its bucket name as an environment variable).
   - 1 AWS Kendra index (receives its ARN Role as an environment variable).
+  - 1 AWS Lex Bot (receives its ARN Role as an environment variable).
   - 1 HTTP API Gateway.
   - 1 AWS Lambda with the handler described in the Backend App.
   - 1 HTTP Lambda Integration between the API Gateway and the Lambda.
@@ -31,10 +38,10 @@ Welcome to the Turbo Repository! This mono repository is designed to efficiently
 
 ## Getting Started
 
-### Prerequisites
+### ⚠️  Prerequisites
 
 1. Node.js and npm installed.
-2. AWS CLI configured with necessary credentials.
+2. [Turbo](https://turbo.build/repo/docs/installing) Node.js package globally installed
 
 ### Setup
 
@@ -51,8 +58,6 @@ Welcome to the Turbo Repository! This mono repository is designed to efficiently
     npm install
     ```
 
-3. Navigate to the `backend` and `infrastructure` directories, and follow the README instructions for each app to set up the required environment variables.
-
 ## Deploy
 
 1. Deploy the services:
@@ -65,7 +70,7 @@ Welcome to the Turbo Repository! This mono repository is designed to efficiently
 
 The AWS SAM CLI locally deploys on Docker the required API Gateway and AWS Lambda so you can test.
 
-**Prerequisites**: You should have deployed the infrastructure at least once, so that the S3 Bucket and the AWS Kendra index exist when the Lambda code is executed.
+**⚠️ Prerequisites**:  You should have deployed the infrastructure at least once, so that the S3 Bucket and the AWS Kendra index exist when the Lambda code is executed.
 
 1. Install the [Docker Engine](https://docs.docker.com/engine/install/)
 2. Install the [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
