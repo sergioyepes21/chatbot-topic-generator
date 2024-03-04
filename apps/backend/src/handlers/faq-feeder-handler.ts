@@ -45,6 +45,7 @@ export async function faqFeederHander(
   console.log(`fileContent:`, fileContent);
 
   const key = await uploadCSVFile(fileContent, body.topic);
+  console.log(`key:`, key);
   await addFAQUtterances(body.topic, key);
 
   return {
@@ -123,7 +124,7 @@ async function addFAQUtterances(
   try {
     const faqUtteranceName = topic.toLowerCase().replace(/ /g, '-');
     console.log(`faqUtteranceName:`, faqUtteranceName);
-    await aiFaqClient.addFAQUtterances({
+    const output = await aiFaqClient.addFAQUtterances({
       name: faqUtteranceName,
       extraArgs: {
         bucket: bucketName,
@@ -132,6 +133,7 @@ async function addFAQUtterances(
         key,
       }
     })
+    console.log(`output:`, JSON.stringify(output, null, 2));
   } catch (e) {
     console.error(e);
     throw new Error(`Error adding FAQ utterances: ${e}`);

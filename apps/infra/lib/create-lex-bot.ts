@@ -2,13 +2,11 @@ import * as cdk from 'aws-cdk-lib';
 import * as kendra from 'aws-cdk-lib/aws-kendra';
 import * as lex from 'aws-cdk-lib/aws-lex';
 import { loadEnvironmentVariables } from '@chatbot-topic/environment-configuration';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 
 const config = loadEnvironmentVariables({
   LEX_BOT_NAME: {
-    constraint: 'required',
-  },
-  LEX_BOT_ROLE_ARN: {
     constraint: 'required',
   },
 });
@@ -20,14 +18,7 @@ export function createLexBot(
 
   const botFallbackIntent: lex.CfnBot.IntentProperty = {
     name: 'FallbackIntent',
-    sampleUtterances: [
-      {
-        utterance: 'I don\'t know',
-      },
-      {
-        utterance: 'I don\'t understand'
-      }
-    ],
+    parentIntentSignature: 'AMAZON.FallbackIntent',
     description: 'Fallback intent for the bot',
     initialResponseSetting: {
       codeHook: {
@@ -37,17 +28,17 @@ export function createLexBot(
           successResponse: undefined,
           successNextStep: {
             dialogAction: {
-              type: 'ElicitIntent',
+              type: 'EndConversation',
             }
           },
           timeoutNextStep: {
             dialogAction: {
-              type: 'ElicitIntent',
+              type: 'EndConversation',
             }
           },
           failureNextStep: {
             dialogAction: {
-              type: 'ElicitIntent',
+              type: 'EndConversation',
             }
           }
         }
@@ -64,7 +55,7 @@ export function createLexBot(
     name: 'KendraSearchIntent',
     parentIntentSignature: 'AMAZON.KendraSearchIntent',
     kendraConfiguration: {
-      kendraIndex: kendraIndex.ref,
+      kendraIndex: kendraIndex.attrArn,
       queryFilterStringEnabled: false
     },
     fulfillmentCodeHook: {
@@ -126,6 +117,7 @@ export function createLexBot(
       nextStep: {
         dialogAction: {
           type: "StartIntent",
+          suppressNextMessage: true
         },
         intent: {
           name: kendraSearchIntent.name,
@@ -210,17 +202,48 @@ export function createLexBot(
       botRequiredIntent,
     ]
   };
+  const lexBotRoleArn = createLexBotRoleArn.bind(this)(kendraIndex);
 
   const lexBot = new lex.CfnBot(this, config.LEX_BOT_NAME, {
     name: config.LEX_BOT_NAME,
     description: 'A bot to answer frequently asked questions',
     dataPrivacy: {
-      childDirected: false,
+      ChildDirected: false,
     },
-    roleArn: config.LEX_BOT_ROLE_ARN,
+    roleArn: lexBotRoleArn.roleArn,
     botLocales: [botENUSLocale],
     idleSessionTtlInSeconds: 300,
   });
 
   return lexBot;
+}
+
+function createLexBotRoleArn(
+  this: cdk.Stack,
+  kendraIndex: kendra.CfnIndex,
+): iam.Role {
+  const lexBotRole = new iam.Role(this, 'FAQLexBotRole', {
+    assumedBy: new iam.ServicePrincipal('lex.amazonaws.com'),
+  });
+
+  lexBotRole.addToPolicy(
+    new iam.PolicyStatement({
+      actions: [
+        'kendra:Query',
+        'kendra:Retrieve'
+      ],
+      resources: [kendraIndex.roleArn],
+    })
+  );
+
+  lexBotRole.addToPolicy(
+    new iam.PolicyStatement({
+      actions: [
+        'polly:SynthesizeSpeech'
+      ],
+      resources: ['*'],
+    }),
+  );
+
+  return lexBotRole;
 }

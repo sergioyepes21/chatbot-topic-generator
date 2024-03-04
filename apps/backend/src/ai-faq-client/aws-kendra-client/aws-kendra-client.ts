@@ -1,5 +1,6 @@
 import { AIFAQClient, AddFAQUterancesInput } from "../ai-faq-client";
 import { KendraClient, CreateFaqCommand } from "@aws-sdk/client-kendra";
+
 export class AWSKendraClient implements AIFAQClient<'kendra'> {
   private readonly kendraClient: KendraClient;
 

@@ -17,16 +17,13 @@ const config = loadEnvironmentVariables({
   S3_BUCKET_NAME: {
     constraint: 'required',
   },
-  FAQ_ROLE_ARN: {
-    constraint: 'required',
-  },
 });
 
 export function createFAQFeederLambdaFunction(
   this: cdk.Stack,
-  s3Bucket: s3.Bucket,
   kendraIndex: kendra.CfnIndex,
 ): lambdaNodejs.NodejsFunction {
+  const faqIndexRole = createFAQIndexRole.bind(this)();
   const faqFeederHandler = new lambdaNodejs.NodejsFunction(this, 'FAQFeederFunction', {
     functionName: 'faq-feeder-function',
     description: 'A Lambda function to handle Lex Bot resource',
@@ -34,8 +31,8 @@ export function createFAQFeederLambdaFunction(
     handler: 'faqFeederHander',
     environment: {
       OPENAI_API_KEY: config.OPENAI_API_KEY,
-      S3_BUCKET_NAME: s3Bucket.bucketName,
-      FAQ_ROLE_ARN: config.FAQ_ROLE_ARN,
+      S3_BUCKET_NAME: config.S3_BUCKET_NAME,
+      FAQ_ROLE_ARN: faqIndexRole.roleArn,
       INDEX_ID: kendraIndex.ref,
     },
     logRetention: logs.RetentionDays.ONE_DAY,
@@ -57,4 +54,24 @@ export function createFAQFeederLambdaFunction(
   });
   faqFeederHandler.addToRolePolicy(faqFeederPolicy);
   return faqFeederHandler;
+}
+
+function createFAQIndexRole(
+  this: cdk.Stack,
+): iam.Role {
+  const indexRole = new iam.Role(this, 'KendraFAQRole', {
+    assumedBy: new iam.ServicePrincipal('kendra.amazonaws.com'),
+  });
+
+  const kendraPolicy = new iam.PolicyStatement({
+    actions: [
+      "s3:GetObject"
+    ],
+    effect: iam.Effect.ALLOW,
+    resources: [
+      `arn:aws:s3:::${config.S3_BUCKET_NAME}/*`
+    ],
+  });
+  indexRole.addToPolicy(kendraPolicy);
+  return indexRole;
 }
